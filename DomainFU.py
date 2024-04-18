@@ -107,7 +107,7 @@ class DomainFinding:
     
     # kiểm tra thời gian tạo của tên miền
     def check_uptime(self, uptime):
-        if int(uptime) <= 200:
+        if int(uptime) <= 7:
             return True
         else:
             return False
