@@ -173,13 +173,13 @@ class StorageDomain:
     def __init__(self, path_save=None):
         self.path_save = path_save
     
-    def save_domain(self, domain):
+    def save_domain(self, domain, clsf: int):
         if self.path_save is None:
             with open("saved.txt", mode="a", encoding="utf-8") as file:
-                file.write(f"{domain}\n")
+                file.write(f"{domain} : {clsf}\n")
         else: 
             with open(self.path_save, mode="a", encoding="utf-8") as file:
-                file.write(f"{domain} : 1\n")
+                file.write(f"{domain} : {clsf}\n")
 
     
 # dùng các tập lệnh để tạo ra 1 step hoàn chỉnh để chạy tool
@@ -198,7 +198,9 @@ class RunTool:
                 continue
             domain_pred = PredictDomain(path_train=self.path_train).predict(domain=domain_info)
             if domain_pred in "1":
-                StorageDomain(path_save=self.path_save).save_domain(domain=domain)
+                StorageDomain(path_save=self.path_save).save_domain(domain=domain, clsf=1)
+            else:
+                StorageDomain(path_save=self.path_save).save_domain(domain=domain, clsf=0)
 
 class TrainingToolPredict:
     def __init__(self, path_train="train.txt", tlds=["net", "com"]):
