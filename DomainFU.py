@@ -11,17 +11,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
+import platform
+
+system_name = platform.system()
 
 # tải các gói cần thiết nếu chưa có
-def install(path_pip):
-    install_command = f"{path_pip} install selenium webdriver-manager python-whois scikit-learn numpy"
-    os.system(str(install_command))
-    try:
-        from webdriver_manager.chrome import ChromeDriverManager
-        print(ChromeDriverManager().install())
-    except:
-        return "đã có lỗi khi tải chrome driver"
-install("C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe")
+class InstallPackage:
+    def install(self, path_pip):
+        install_command = f"{path_pip} install selenium webdriver-manager python-whois scikit-learn numpy"
+        os.system(str(install_command))
+        try:
+            from webdriver_manager.chrome import ChromeDriverManager
+            print(ChromeDriverManager().install())
+        except:
+            return "đã có lỗi khi tải chrome driver"
 
 
 # lấy thông tin tên miền
@@ -60,7 +63,7 @@ class DomainFinding:
         option.add_argument("--log-level=3")
         option.add_argument("--headless")
         browser = webdriver.Chrome(options=option)
-        os.system("cls")
+        os.system("cls") if system_name in "Windows" else os.system("clear")
         return browser
     
     def finding_domain(self):
@@ -213,18 +216,49 @@ class TrainingToolPredict:
     
     def clasify_via_chatui(self):
         while True:
-            inp_domain = input("nhập vào đây tên miền mà bạn muốn training : ")
+            inp_domain = input("nhập vào đây tên miền mà bạn muốn training : ").lower().strip()
             if inp_domain.split(".")[1] not in self.tlds:
                 print(f"xin hãy nhập tên miền hợp lệ đúng với các tlds sau {self.tlds}")
                 continue
             inp_clsf = input("nhập vào đây 1 / 0 : ")
             if inp_clsf not in ["1", "0"]:
+                os.system("cls") if system_name in "Windows" else os.system("clear") 
                 print("vui lòng nhập số phân loại hợp lệ để training (1 hoặc 0)")
                 continue
             
             train_info = GetDomainInfo().domain_information(inp_domain)
-            self.save_train(train_info=train_info, binary_clsf=inp_clsf)
 
+            try:
+                self.save_train(train_info=train_info, binary_clsf=inp_clsf)
+            except:
+                input("tên file train không hợp lệ vui lòng xem lại ạ, enter để bỏ qua <_| : ")
+
+            os.system("cls") if system_name in "Windows" else os.system("clear") 
+            print("cảm ơn bạn đã cho tôi biết, tôi sẽ tốt hơn nhờ lần dạy này, tôi đã nhận được rồi nhé <3")
+
+
+class PredictDomainByDomain:
+    def __init__(self, path_train, tlds):
+        self.tlds = tlds
+        self.path_train = path_train
+
+    def predict(self):
+        print("xin chào bạn bạn có thể dùng tôi để dự đoán từng domain lẻ tại đây ^.^")
+        while True:
+            inp = input("nhập domain mà bạn muốn dự đoán : ").lower().strip()
+            try:
+                if inp.split(".")[1] not in self.tlds:
+                    os.system("cls") if system_name in "Windows" else os.system("clear") 
+                    print("vui lòng nhập tên miền có trong giới hạn của tlds", 
+                          f" đây là giới hạn mà mô hình đã được đào tạo : {self.tlds}")
+                    continue
+            except:
+                os.system("cls") if system_name in "Windows" else os.system("clear") 
+                print("vui lòng nhập tên miền hợp lệ đi ạ")
+                continue
+            predict_result = PredictDomain(path_train=self.path_train).predict(domain=inp)
+            os.system("cls") if system_name in "Windows" else os.system("clear") 
+            print(f"kết quả dự đoán : {predict_result}")
 
 class CommandUiChatQality:
     def __init__(self, x, y):
@@ -243,27 +277,67 @@ class CommandUiChatQality:
 
 # dữ liệu train cho mô hình chat nhận diện lệnh
 user_command = [["1", "tôi muốn chạy tool","chạy tool", "run tool đi", "kích hoạt tool",
-                "bật đào tạo", "đào tạo bạn", "training", "2"]]
+                "bật đào tạo", "đào tạo bạn", "training", "2",
+                "tải gói", "install package", "tải", "tải gói cho tool",
+                "dự đoán tên miền", "dự đoán tên miền lẻ", "dự đoán miền", "đoán domain"]]
+
 predict_command = ["run tool", "run tool", "run tool", "run tool", "run tool",
-             "training", "training", "training", "training"]
+             "training", "training", "training", "training",
+             "install pack", "install pack", "install pack", "install pack",
+              "domain predict", "domain predict", "domain predict", "domain predict"]
+
+
+path_log = "log.txt"
+path_save = "saved.txt"
+path_train = "train.txt"
+tlds = ["net", "com"]
+
+if os.path.exists(path=path_log) and os.path.exists(path=path_save) and os.path.exists(path=path_train) == False:
+    print("chưa có các file cần thiết, tiến hành tạo ...")
+    for path in [path_log, path_save, path_train]:
+        with open(path, mode="a"):
+            continue
+else:
+    print("đã có đầy đủ file cần thiết")
 
 # giao diện dòng lệnh
 def command_ui():
-    print("\n* lưu ý: train cho ireland\n- chạy tool\n- training cho nó\n")
+    print("\n* lưu ý: train cho ireland\n- chạy tool\n- training cho nó\n- tải gói để chạy")
+    print("- dự đoán tên miền\n")
     inp = input("chọn 1 trong những lựa chọn trên : ")
-    
-    path_log = "log.txt"
-    path_save = "saved.txt"
-    path_train = "train.txt"
-    tlds = ["net", "com"]
 
     cm_pred = CommandUiChatQality(x=user_command, y=predict_command).predict([inp])
-    print(f"đã hiểu, bạn muốn : {cm_pred}")
-    if cm_pred in "run tool":
-        while True:
-            run_tool = RunTool(path_log=path_log, path_save=path_save, path_train=path_train, tlds=tlds)
-            run_tool.run()
-    else:
-        TrainingToolPredict().clasify_via_chatui()
+    print(f"đã hiểu, bạn muốn : {cm_pred}\n")
 
-command_ui()
+    if cm_pred in "run tool":
+        
+        # vòng lặp lòng tự động xóa tham chiếu giảm tải máy
+        while True:
+            try:
+                for _ in range(100):
+                    run_tool = RunTool(path_log=path_log, path_save=path_save, path_train=path_train, tlds=tlds)
+                    run_tool.run()
+                del(run_tool, _)
+            except:
+                continue
+
+    elif cm_pred in "training":
+        TrainingToolPredict().clasify_via_chatui()
+    
+    elif cm_pred in "install pack":
+        while True:
+            inp = input("nhập lệnh pip để tải hoặc nhấn hủy để quay lại : ")
+            if inp in "hủy":
+                os.system("cls") if system_name in "Windows" else os.system("clear") 
+                break
+            try:
+                print(InstallPackage().install(inp))
+            except:
+                print("đã có lỗi từ lệnh pip hoặc lỗi nhập đầu vào của bạn")
+                continue
+    
+    elif cm_pred in "domain predict":
+        PredictDomainByDomain(tlds=tlds, path_train=path_train).predict()
+
+while True:
+    command_ui()
