@@ -54,6 +54,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
 import platform
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 system_name = platform.system()
 
@@ -62,11 +64,16 @@ class InstallPackage:
     def install(self, path_pip):
         install_command = f"{path_pip} install selenium webdriver-manager python-whois scikit-learn numpy"
         os.system(str(install_command))
-        try:
-            from webdriver_manager.chrome import ChromeDriverManager
-            print(ChromeDriverManager().install())
-        except:
-            return "đã có lỗi khi tải chrome driver"
+        if system_name in "Windows":
+            try:
+                print(ChromeDriverManager().install())
+            except:
+                return "đã có lỗi khi tải chrome driver"
+        else:
+            try:
+                print(GeckoDriverManager().install())
+            except:
+                return "đã có lỗi khi tải firefox driver"
 
 
 # lấy thông tin tên miền
