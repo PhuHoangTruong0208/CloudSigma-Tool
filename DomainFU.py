@@ -1,3 +1,45 @@
+# giao diện dòng lệnh
+def run_beforce_import(func):
+    def command_ui():
+        print("\n* lưu ý: train cho ireland\n- chạy tool\n- training cho nó\n- tải gói để chạy")
+        print("- dự đoán tên miền\n")
+        inp = input("chọn 1 trong những lựa chọn trên : ")
+
+        cm_pred = CommandUiChatQality(x=user_command, y=predict_command).predict([inp])
+        print(f"đã hiểu, bạn muốn : {cm_pred}\n")
+
+        if cm_pred in "run tool":
+        
+            # vòng lặp lòng tự động xóa tham chiếu giảm tải máy
+            while True:
+                try:
+                    for _ in range(100):
+                        run_tool = RunTool(path_log=path_log, path_save=path_save, path_train=path_train, tlds=tlds)
+                        run_tool.run()
+                        del(run_tool, _)
+                except:
+                    continue
+
+        elif cm_pred in "training":
+            TrainingToolPredict().clasify_via_chatui()
+    
+        elif cm_pred in "install pack":
+            while True:
+                inp = input("nhập lệnh pip để tải hoặc nhấn hủy để quay lại : ")
+                if inp in "hủy":
+                    os.system("cls") if system_name in "Windows" else os.system("clear") 
+                    break
+                try:
+                    print(InstallPackage().install(inp))
+                except:
+                    print("đã có lỗi từ lệnh pip hoặc lỗi nhập đầu vào của bạn")
+                    continue
+    
+        elif cm_pred in "domain predict":
+            PredictDomainByDomain(tlds=tlds, path_train=path_train).predict()
+    return command_ui
+
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -300,44 +342,9 @@ if os.path.exists(path=path_log) and os.path.exists(path=path_save) and os.path.
 else:
     print("đã có đầy đủ file cần thiết")
 
-# giao diện dòng lệnh
-def command_ui():
-    print("\n* lưu ý: train cho ireland\n- chạy tool\n- training cho nó\n- tải gói để chạy")
-    print("- dự đoán tên miền\n")
-    inp = input("chọn 1 trong những lựa chọn trên : ")
 
-    cm_pred = CommandUiChatQality(x=user_command, y=predict_command).predict([inp])
-    print(f"đã hiểu, bạn muốn : {cm_pred}\n")
-
-    if cm_pred in "run tool":
-        
-        # vòng lặp lòng tự động xóa tham chiếu giảm tải máy
-        while True:
-            try:
-                for _ in range(100):
-                    run_tool = RunTool(path_log=path_log, path_save=path_save, path_train=path_train, tlds=tlds)
-                    run_tool.run()
-                del(run_tool, _)
-            except:
-                continue
-
-    elif cm_pred in "training":
-        TrainingToolPredict().clasify_via_chatui()
-    
-    elif cm_pred in "install pack":
-        while True:
-            inp = input("nhập lệnh pip để tải hoặc nhấn hủy để quay lại : ")
-            if inp in "hủy":
-                os.system("cls") if system_name in "Windows" else os.system("clear") 
-                break
-            try:
-                print(InstallPackage().install(inp))
-            except:
-                print("đã có lỗi từ lệnh pip hoặc lỗi nhập đầu vào của bạn")
-                continue
-    
-    elif cm_pred in "domain predict":
-        PredictDomainByDomain(tlds=tlds, path_train=path_train).predict()
-
+@run_beforce_import
+def run():
+    pass
 while True:
-    command_ui()
+    run()
