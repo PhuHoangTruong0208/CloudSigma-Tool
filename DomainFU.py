@@ -2,7 +2,7 @@
 def run_beforce_import(func):
     def command_ui():
         print("\n* lưu ý: train cho ireland\n- chạy tool\n- training cho nó\n- tải gói để chạy")
-        print("- dự đoán tên miền\n")
+        print("- dự đoán tên miền\n- dự đoán hàng loạt từ tệp\n")
         inp = input("chọn 1 trong những lựa chọn trên : ")
 
         cm_pred = CommandUiChatQality(x=user_command, y=predict_command).predict([inp])
@@ -37,6 +37,9 @@ def run_beforce_import(func):
     
         elif cm_pred in "domain predict":
             PredictDomainByDomain(tlds=tlds, path_train=path_train).predict()
+
+        elif cm_pred in "file predict":
+            PredictFromFile().predict_file(path_save=path_save, path_train=path_train)
     return command_ui
 
 
@@ -309,6 +312,27 @@ class PredictDomainByDomain:
             os.system("cls") if system_name in "Windows" else os.system("clear") 
             print(f"kết quả dự đoán : {predict_result}")
 
+
+class PredictFromFile:
+    def predict_file(self, path_save, path_train):
+        with open(path_save, mode="r", encoding="utf-8") as file:
+            domains = file.read().splitlines()
+        for i in range(len(domains)):
+            domains[i] = domains[i].split(" : ")[0]
+        
+        domain_predict = PredictDomain(path_train=path_train)
+        for domain in domains:
+            try:
+                y_pred = domain_predict.predict(domain=domain)
+                print(f"{domain} kết quả: {y_pred}")
+            except:
+                print(f"tên miền {domain} đã có lỗi")
+                continue
+        input("đã xong, nhấn enter để quay lại console : ")
+
+
+
+# chat nhận diện lệnh
 class CommandUiChatQality:
     def __init__(self, x, y):
         self.x = x
@@ -328,12 +352,14 @@ class CommandUiChatQality:
 user_command = [["1", "tôi muốn chạy tool","chạy tool", "run tool đi", "kích hoạt tool",
                 "bật đào tạo", "đào tạo bạn", "training", "2",
                 "tải gói", "install package", "tải", "tải gói cho tool",
-                "dự đoán tên miền", "dự đoán tên miền lẻ", "dự đoán miền", "đoán domain"]]
+                "dự đoán tên miền", "dự đoán tên miền lẻ", "dự đoán miền", "đoán domain",
+                "file predict", "dự đoán file", "đoán từ file", "đoán trong tệp", "dự đoán tệp"]]
 
 predict_command = ["run tool", "run tool", "run tool", "run tool", "run tool",
              "training", "training", "training", "training",
              "install pack", "install pack", "install pack", "install pack",
-              "domain predict", "domain predict", "domain predict", "domain predict"]
+              "domain predict", "domain predict", "domain predict", "domain predict",
+              "file predict", "file predict", "file predict", "file predict", "file predict"]
 
 
 path_log = "log.txt"
