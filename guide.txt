@@ -1,0 +1,5 @@
+english (tiếng anh)
+let's go come this path folder and using this command: pip install -r requirements.txt
+
+tiếng việt (vietnamese)
+hãy đến thư mục đường dẫn này và sử dụng lệnh này: pip install -r require.txt

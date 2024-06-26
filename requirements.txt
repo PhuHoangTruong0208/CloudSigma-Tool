@@ -1,0 +1,4 @@
+python-whois
+scikit-learn
+selenium
+webdriver-manager
