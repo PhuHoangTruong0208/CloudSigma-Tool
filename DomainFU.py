@@ -367,7 +367,7 @@ path_save = "saved.txt"
 path_train = "train.txt"
 tlds = ["net", "com"]
 
-if os.path.exists(path=path_log) and os.path.exists(path=path_save) and os.path.exists(path=path_train) == False:
+if os.path.exists(path_log) and os.path.exists(path_save) and os.path.exists(path_train) == False:
     print("chưa có các file cần thiết, tiến hành tạo ...")
     for path in [path_log, path_save, path_train]:
         with open(path, mode="a"):
